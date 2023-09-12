@@ -1,19 +1,17 @@
 ---
 title: "Data Analysis and Lab_Lab 2"
 author: "Na SeungChan"
-date: "2023-09-12"
+author: "Na SeungChan"
+date: "`r Sys.Date()`"
+mainfont : NanumGothic
 output:
   html_document:
     df_print: paged
   pdf_document:
     latex_engine: xelatex
-monofont: UnShinmun
-mainfont: UnDotum
 ---
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library('tidyverse')
 ```
 
 
