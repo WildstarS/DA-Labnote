@@ -1,0 +1,36 @@
+---
+title: "DA_LAB2_Exercises"
+author: "Na SeungChan"
+date: "2023-09-12"
+output: pdf_document
+mainfont: UnDotum
+monofont: UnShinmun
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+# Exercise 1
+
+
+```{r}
+head(cars)
+plot(cars)
+```
+
+
+
+# Exercise 2
+
+
+* __2023-1__ Regression Analysis and Lab
+* __2023-1__ Econometrics
+* __2021-1__ Linear Algebra I
+
+
+![my image](https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png)
+
+
