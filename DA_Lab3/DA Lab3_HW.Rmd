@@ -1,0 +1,37 @@
+---
+title: "Data Analysis and Lab_Lab 3"
+author: "Na SeungChan"
+author: "Na SeungChan"
+date: "`r Sys.Date()`"
+mainfont : NanumGothic
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+# Exercise 1
+
+
+```{r}
+library(mosaic)
+head(Galton)
+```
+
+## (a) 
+
+
+
+
+
+
+
+
+
