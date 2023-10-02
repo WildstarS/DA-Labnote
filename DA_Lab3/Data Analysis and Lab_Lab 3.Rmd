@@ -1,7 +1,6 @@
 ---
 title: "Data Analysis and Lab_Lab 3"
 author: "Na SeungChan"
-author: "Na SeungChan"
 date: "`r Sys.Date()`"
 mainfont : NanumGothic
 output:
