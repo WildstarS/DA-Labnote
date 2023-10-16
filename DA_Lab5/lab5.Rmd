@@ -284,7 +284,7 @@ tidy_DTM %>%
   head()
 ```
 
-On the other hand, “wildfire” has a high `idf` score since it is included in only one abstract (though it is used 10 times).
+On the other hand, “wildfire” has a high `idf` score since it is included *in only one abstract* (though it is used 10 times).
 ```{r}
 arxiv_papers %>%
   pull(abstract) %>%
@@ -293,7 +293,7 @@ arxiv_papers %>%
   head()
 ```
 
-In contrast, “implications” appears in 25 abstracts.
+In contrast, “implications” appears in 25 abstracts. - 각 논문마다 idf는 n = 1이므로 같지만 tf는 달라짐.
 ```{r}
 tidy_DTM %>%
   filter(word == "implications")
