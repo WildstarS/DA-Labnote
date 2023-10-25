@@ -14,9 +14,9 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(mdsr)
 library(olsrr)
-library(mosaicData)#to load HELPrct
 library(lmtest)
 library(glmnet)
+#library(mosaicData)#to load HELPrct
 ```
 
 # Exercises
