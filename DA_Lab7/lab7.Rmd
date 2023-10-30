@@ -70,6 +70,7 @@ The `glm` function is used almost identically to how we used `lm`, but because i
 affairs_m <- glm(cheater ~ gender + rating,
                  family = binomial(link = 'logit'),
                  data = affairs_df)
+#family : glm-special part. 'family' specifies the distribution g follows. 
 
 summary(affairs_m)
 ```

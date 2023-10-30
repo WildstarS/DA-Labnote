@@ -16,29 +16,36 @@ library(tidyverse)
 ```
 
 
+---
+
+
+
 ## 1. Feature engineering
+
 In this section, we will study methods to handle variables. Transforming variables to use in modeling is called `feature engineering`.
 
 ```{r}
 data = read.csv('akc.csv')
 ```
 
-- Qualitative variable
+- Qualitative variable(양적 변수)
 ```{r}
 hist(data$min_height)
 ```
 
-- Nominal variables
+- Nominal variables(명목형 변수)
 ```{r}
 table(data$group)
 ```
 
-- Ordinal variables
+- Ordinal variables(순서형 변수)
 ```{r}
 table(data$grooming_frequency_category)
 ```
 
+
 ### Handling qualitative variables
+
 Usually it is easy to use numeric data as it is. However, sometimes we have to handle it.
 ```{r}
 ht = na.omit(data$min_height)
@@ -60,14 +67,22 @@ table(cut_ht)
 We have to make string variables into factor variables.
 ```{r}
 typeof(data$group)
+data$group[1]
 typeof(factor(data$group))
+factor(data$group)[1]
 ```
 
 To deal with nominal variables, we usually use `one-hot encoding`.
 ```{r}
-one_hot = model.matrix(~0+data$group)
+one_hot = model.matrix(~0 + data$group)
 head(one_hot)
+#print(one_hot)
+#head(model.matrix(~1 + data$group))
+#print(model.matrix(~1+data$group))
 ```
+
+`model.matrix(object, data = environment(object), contrasts.arg = NULL, xlev = NULL, ...)` 함수는 data로부터 matrix를 만들어냄. ~0 부분은 intercept가 0임을 나타냄. 
+
 
 
 ### Handling ordinal variables
@@ -91,7 +106,7 @@ sum(is.na(shedding))
 length(shedding)
 ```
 
-First, we may remove values with NA.
+First, we may remove values with NA.(mutate(A = na.omit(A)))
 ```{r}
 shedding1 = na.omit(shedding)
 sum(is.na(shedding1))
