@@ -80,8 +80,12 @@ $$
 $$
 for $k = 1,2,\dots,K-1$.
 
+로지스틱 리그레션은 k가 많은 경우에는 일단 쓸 이유 없음. 머신러닝을 쓰는 게 나으니... 특히 프리딕션에만 관심 있는 경우는 더 그렇고.
+X=x일 때 Y일 확률을 직접 모델링하는 상황. 앞으로는 '분포'를 가정함.
+
+
 ### 1-2. LDA
-Logistic regression involves directly modeling $\Pr(Y=k \vert X=x)$ using the logistic function. In statistical jargon, we model the conditional distribution of the response $Y$, given the predictors $X$. We then use Bayes Theorem to flip the conditional probabilities. When the distribution of $X$ within each class is assumed to be normal, it turns out that the model is very similar in form to logistic regression.
+Logistic regression involves directly modeling $\Pr(Y=k \vert X=x)$ using the logistic function. In statistical jargon, we model the conditional distribution of the response $Y$, given the predictors $X$. We then use Bayes Theorem to flip the conditional probabilities. When the distribution of $X$ within each class is assumed to be normal, it turns out that the model is very similar in form to logistic regression.(Y가 주어진 때 x의 분포를 가정)
 
 Why do we need another method, when we have logistic regression?
 - When there is substantial separation between the two classes, the parameter estimates for the logistic regression model are surprisingly unstable. The methods that we consider in this section do not suffer from this problem.
@@ -96,7 +100,7 @@ We will use the abbreviation $p_k(x) = \Pr(Y=k \vert X=x)$; this is the posterio
 
 We will consider $p=1$ case. We would like to obtain an estimate for $f_k(x)$ in order to estimate $p_k(x)$. We will then classify an observation to the class for which $p_k(x)$ is the greatest. To estimate $f_k(x)$, we will first make some assumptions about its form.
 
-In particular, we assume that $f_k(x)$ is Gaussian with mean $\mu_k$ and variance $\sigma_k^2$. Let us further assume that $\sigma_1^2 = \cdots = \sigma_K^2 = \sigma^2$. By plugging-in,
+In particular, we assume that $f_k(x)$ is Gaussian with mean $\mu_k$ and variance $\sigma_k^2$. Let us further assume that $\sigma_1^2 = \cdots = \sigma_K^2 = \sigma^2$. By plugging-in,(등분산 가정, 상수가 다 똑같으니 계산할 필요 X, 교수님은 직접 계산하기를 원함.)
 $$
 p_k(x) = \frac{\pi_k\frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{1}{2\sigma^2}(x-\mu_k)^2}}{\sum_{l=1}^K \pi_l\frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{1}{2\sigma^2}(x-\mu_l)^2}}
 $$
@@ -109,7 +113,7 @@ $$
 x = \frac{\mu_1+\mu_2}{2}
 $$
 ![](LDA1.png)
-In linear discriminant analysis (LDA), we estimate $\mu_1,\cdots,\mu_K,\pi_1,\cdots,\pi_K,\sigma^2$. We plug in estimates to estimate the posterior probabilities.
+In linear discriminant analysis (LDA), we estimate $\mu_1,\cdots,\mu_K,\pi_1,\cdots,\pi_K,\sigma^2$. We plug in estimates to estimate the posterior probabilities.(분류 기준이 '선'이므로 LDA : 문제는 앞의 값을 알 수 없으므로 다 추정해서 대입해야 함.)
 $$
 \hat\delta_k(x) = x\frac{\hat\mu_k}{\hat\sigma^2} - \frac{\hat\mu_k^2}{2\hat\sigma^2} + \text{log}(\hat\pi_k)
 $$
@@ -159,6 +163,9 @@ table_qda = table(Real = Default$default, Est = predict(model6)$class)
 table_qda
 ```
 
+LDA, QDA 모두 실제 yes를 yes로 잘 예측하지 못하는 문제 있음.
+
+
 
 ### 1-4. Naive Bayes
 In previous section, we used Bayes Theorem to develop the LDA and QDA classifiers. Now, we use Bayes Theorem to motivate the popular naive Bayes classifier.
@@ -180,11 +187,11 @@ $$
 \Pr(Y=k\vert X=x) = \frac{\pi_k\times f_{k1}(x_1) \times f_{k2}(x_2) \times \cdots \times f_{kp}(x_p)}
 {\sum_{l=1}^K\pi_l\times f_{l1}(x_1) \times f_{l2}(x_2) \times \cdots \times f_{lp}(x_p)}
 $$
-for $k = 1,2,\cdots, K$.
+for $k = 1,2,\cdots, K$. (1차원 pdf 예측 상황임 - bias 생길 수 있지만 var 감소, 많은 경우 이와 같은 것이 효율적.)
 
 In R,
 ```{r}
-library(e1071)
+library(e1071)#for naiveBayes
 model7 = naiveBayes(default ~ balance, data = Default)
 model7
 ```
@@ -218,11 +225,14 @@ accuracy(table_qda)
 accuracy(table_nb)
 ```
 
+보통 특정 상황이 dominate면 accuracy의 의미 감소(무조건 yes/no여도 정확도는 상승할 수 있음)
+
+
 $$
 \text{Sensitivity}=\frac{\text{TP}}{\text{TP+FN}}
 $$
 
-- Sensitivity (Recall)
+- Sensitivity(보통 스펙시피티와) (Recall)
 ```{r}
 sensitivity = function(table){(table[2,2])/(table[2,1]+table[2,2])}
 sensitivity(table_lr)
@@ -247,7 +257,7 @@ specificity(table_nb)
 $$
 \text{Precision}=\frac{\text{TP}}{\text{TP+FP}}
 $$
-- Precision
+- Precision(보통 리콜과)
 ```{r}
 precision = function(table){(table[2,2])/(table[1,2]+table[2,2])}
 precision(table_lr)
@@ -308,7 +318,9 @@ p <- (1 - pnorm(abs(z), 0, 1)) * 2
 p
 ```
 
-None of these coefficients is significant...!
+None of these coefficients is significant...! 
+
+배리언스도 높고....
 
 ```{r}
 head(fitted(multi))
@@ -331,6 +343,8 @@ Q(\beta\vert\mathbf{X}, \mathbf{y}) = -\sum_{i = 1}^n \{y_i \log(q_i) +(1-y_i) \
 $$
 
 The penalty terms can determine the penalized regression methods (Ridge, Lasso, MCP, or Elastic net). We will use the R function `glmnet()` from `glmnet` package for computing the penalized logistic regression.
+
+x는 design matrix로, y는 vector로, 특히 x가 범주형이면 encoding을.
 
 ```{r}
 library(glmnet)
