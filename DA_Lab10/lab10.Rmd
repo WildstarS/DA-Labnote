@@ -25,16 +25,20 @@ How do you know if your model is a good one? In this section, we outline some of
 
 We want to have models that minimize both bias and variance, but to some extent these are mutually exclusive goals. A complicated model will have less bias, but will in general have higher variance. A simple model can reduce variance but at the cost of increased bias. The optimal balance between bias and variance depends on the purpose for which the model is constructed (e.g., prediction vs. description of causal relationships) and the system being modeled. One helpful class of techniques—called regularization—provides model architectures that can balance bias and variance in a graduated way. Examples of regularization techniques are ridge regression and the lasso.
 
+(간단한 모델 : for 인과추론.)
+
 ### 1-2. Cross-validation
 
 A vexing and seductive trap that modelers sometimes fall into is overfitting. Every model discussed in this chapter is fit to a set of data. That is, given a set of training data and the specification for the type of model, each algorithm will determine the optimal set of parameters for that model and those data. However, if the model works well on those training data, but not so well on a set of testing data—that the model has never seen—then the model is said to be overfitting. Perhaps the most elementary mistake in predictive analytics is to overfit your model to the training data, only to see it later perform miserably on the testing set.
+
+(모델이 복잡하면? 성능이 좋아서인지 overfit인지 판단이 어려움.)
 
 In predictive analytics, data sets are often divided into two sets:
 
 - Training: The set of data on which you build your model
 - Testing: After your model is built, this is the set used to test it by evaluating it against data that it has not previously seen.
 
-For example, in this chapter we set aside 80% of the observations to use as a training set, but held back another 20% for testing. The 80/20 scheme we have employed in this chapter is among the simplest possible schemes, but there are other possibilities. Perhaps a 90/10 or a 75/25 split would be a better option. The goal is to have as much data in the training set to allow the model to perform well while having sufficient numbers in the test set to properly assess it.
+For example, in this chapter we set aside 80% of the observations to use as a training set, but held back another 20% for testing. The 80/20 scheme we have employed in this chapter is among the simplest possible schemes, but there are other possibilities. Perhaps a 90/10 or a 75/25 split would be a better option. The goal is to have as much data in the training set to allow the model to perform well while having sufficient numbers in the test set to properly assess it.(5/5 : 잘 안 쓰는듯?)
 
 An alternative approach to combat this problem is cross-validation. To perform a 2-fold cross-validation:
 
@@ -49,11 +53,13 @@ More complex schemes for cross-validating are possible. k-fold cross-validation 
 
 For classifiers, we have already seen the confusion matrix, which is a common way to assess the effectiveness of a classifier.
 
-Recall that each of the classifiers we have discussed in this chapter are capable of producing not only a binary class label, but also the predicted probability of belonging to either class. Rounding the probabilities in the usual way (using 0.5 as a threshold) may not be a good idea, since the average probability might not be anywhere near 0.5, and thus we could have far too many predictions in one class.
+Recall that each of the classifiers we have discussed in this chapter are capable of producing not only a binary class label, but also the predicted probability of belonging to either class. Rounding the probabilities in the usual way (using 0.5 as a threshold) may not be a good idea, since the average probability might not be anywhere near 0.5, and thus we could have far too many predictions in one class.(대각선의 의미 : 찍기)
 
 principled approach to assessing the quality of a classifier is a receiver operating characteristic (ROC) curve. This considers all possible threshold values for rounding, and graphically displays the trade-off between sensitivity (the true positive rate) and specificity (the true negative rate). What is actually plotted is the true positive rate as a function of the false positive rate.
 
-ROC curves are common in machine learning and operations research as well as assessment of test characteristics and medical imaging. They can be constructed in R using the yardstick package. Note that ROC curves operate on the fitted probabilities in (0,1).
+ROC curves are common in machine learning and operations research as well as assessment of test characteristics and medical imaging. They can be constructed in R using the yardstick package. Note that ROC curves operate on the fitted probabilities in (0,1)
+
+로지스틱 리그레션은 1일 확률을 예측할 뿐. 로지스틱 분류 '모델'이라 함은 1일 확률이 0.5 이상이면 1을 주는 문턱값까지 포함하는 개념.
 
 ![](ROC.png)
 
@@ -93,7 +99,7 @@ list(train, test) %>%
   map_int(nrow)
 ```
 
-Since the separation was done by selecting rows uniformly at random, and the number of observations was fairly large, it seems likely that both the training and testing set will contain similar information. For example, the distribution of capital_gain is similar in both the testing and training sets. Nevertheless, it is worth formally testing the performance of our models on both sets.
+Since the separation was done by selecting rows uniformly at random, and the number of observations was fairly large, it seems likely that both the training and testing set will contain similar information. For example, the distribution of capital_gain is similar in both the testing and training sets. Nevertheless, it is worth formally testing the performance of our models on both sets.(다르다면? 뭔가 이상하게 뽑은 것!)
 
 ```{r}
 train %>%
@@ -111,7 +117,7 @@ Consider three models to predict `income` variable.
 ```{r}
 mod_null <- logistic_reg(mode = "classification") %>%
   set_engine("glm") %>%
-  fit(income ~ 1, data = train)
+  fit(income ~ 1, data = train)#null model : constant만 생각. 모든 애들을 똑같은 확률로 예측.
 
 mod_log_1 <- logistic_reg(mode = "classification") %>%
   set_engine("glm") %>%
@@ -152,7 +158,7 @@ mods <- mods %>%
     y_hat_test = map(
       mod, 
       ~pull(predict(.x, new_data = test, type = "class"), .pred_class)
-    )
+    )#from purrr package
   )
 mods
 ```
@@ -185,9 +191,9 @@ mods <- mods %>%
       mod, 
       ~pull(predict(.x, new_data = test, type = "prob"), `.pred_>50K`)
     ),
-    type = fct_reorder(type, sens_test, .desc = TRUE)
+    type = fct_reorder(type, sens_test, .desc = TRUE) #sensitivity의 크기에 따라 order 변경.
   )
-mods %>%
+mods %>% #roc_curve 함수를 통해 위의 결과 plotting.
   select(type, y_test, y_hat_prob_test) %>%
   unnest(cols = c(y_test, y_hat_prob_test)) %>%
   group_by(type) %>%
@@ -200,6 +206,9 @@ mods %>%
   ) + 
   scale_color_brewer("Model", palette = "Set2")
 ```
+
+결과 : 더 잘 쓰는 게 더 예측 잘 되네요....
+
 
 ## 2. Decision Boundary
 
@@ -240,6 +249,9 @@ For LDA classifier,
 ```{r}
 library(MASS)
 lda.model = lda(income ~ hours_per_week + age, data = train)
+summary(lda.model)
+lda.model$means
+lda.model$scaling
 ```
 
 $$
@@ -321,7 +333,7 @@ Next, we add the grid data (X), and then use `map2()` to combine the predictions
 bmi_mods <- bmi_mods %>%
   mutate(
     X = list(fake_grid),
-    yX = map2(y_hat, X, bind_cols)
+    yX = map2(y_hat, X, bind_cols)#각 grid에 대한 예측값.
   )
 ```
 
@@ -348,7 +360,7 @@ ggplot(data = res, aes(x = Age, y = BMI)) +
   scale_size(range = c(0, 2)) + 
   scale_x_continuous(expand = c(0.02, 0)) + 
   scale_y_continuous(expand = c(0.02, 0)) + 
-  facet_wrap(~fct_rev(type))
+  facet_wrap(~fct_rev(type))#최종 그래프. 오른쪽 끝으로 갈수록 높아지는 경향. age, BMI와 모두 양의 상관관계.
 ```
 
 ## 4. Exercises
